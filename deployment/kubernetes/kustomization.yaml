@@ -1,0 +1,5 @@
+resources:
+- postgres.deployment.yaml
+- postgres.service.yaml
+- importer.configmap.yaml
+- importer.deployment.yaml

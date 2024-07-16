@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-importer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-importer
+  template:
+    metadata:
+      labels:
+        app: product-importer
+    spec:
+      containers:
+      - name: importer
+        image: importer:latest
+        imagePullPolicy: Never
+        env:
+        - name: PG_HOST
+          value: postgresql
+        - name: PG_PORT
+          value: "5432"
+        - name: PG_USER
+          value: postgres
+        - name: PG_PASS
+          value: postgres
+        - name: PG_DBNAME
+          value: postgres
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: product-importer-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: product-importer-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: default
+roleRef:
+  kind: Role
+  name: product-importer-role
+  apiGroup: rbac.authorization.k8s.io
